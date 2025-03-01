@@ -4,6 +4,7 @@ using static Unity.Mathematics.math;
 using UnityEngine;
 using EZ.Index.DemoUtils;
 using UnityEditor;
+using System.Collections.Generic;
 
 namespace EZ.Index.GizmoDemo
 {
@@ -19,7 +20,7 @@ namespace EZ.Index.GizmoDemo
             Center3D,
             Corner3D,
 
-            Polar
+            Spherical
         }
 
         [System.Serializable]
@@ -74,6 +75,36 @@ namespace EZ.Index.GizmoDemo
         [SerializeField, Tooltip("Node generation parameters")] Configuration configuration = Configuration.Default;
         [SerializeField, Tooltip("Results of the node generation"), ReadOnly] Result result = Result.Default;
 
+        private readonly Dictionary<int, GameObject> healthdrops = new();
+        [SerializeField] GameObject heartPrefab;
+        [SerializeField] Transform player;
+        private void Start()
+        {
+            var total = GetTotal();
+            for (int i = 0; i < total; i++)
+            {
+                if (Unity.Mathematics.Random.CreateFromIndex((uint)(i + 938983)).NextBool()) continue;
+                var go = Instantiate(heartPrefab, transform);
+                go.transform.position = GetNode(i);
+                healthdrops.Add(i, go);
+            }
+        }
+        private void Update()
+        {
+            var playerPosition = float3(player.position);
+            var node = Grid.SnapCenter(playerPosition.xy, configuration.ratio.xy);
+            var index = Grid.CenterIndex(node, configuration.ratio.xy);
+            if (healthdrops.TryGetValue(index, out var drop))
+            {
+                var closeEnough = distance(playerPosition, drop.transform.position) <= 1;
+                if (closeEnough)
+                {
+                    healthdrops.Remove(index);
+                    Destroy(drop);
+                }
+            }
+        }
+
         float3 GetNode(in int i)
         {
             var node = configuration.domain switch
@@ -84,7 +115,7 @@ namespace EZ.Index.GizmoDemo
                 Domain.Whole3D => Lattice.WholeNode(i, configuration.ratio),
                 Domain.Center3D => Lattice.CenterNode(i, configuration.ratio),
                 Domain.Corner3D => Lattice.CornerNode(i, configuration.ratio),
-                Domain.Polar => Spherical.GetNode(i, configuration.layers).GetCartesian(),
+                Domain.Spherical => Spherical.GetNode(i, configuration.layers).GetCartesian(),
                 _ => throw new("Unknown input"),
             };
 
@@ -96,7 +127,7 @@ namespace EZ.Index.GizmoDemo
                 Domain.Whole3D => Lattice.WholeIndex(node, configuration.ratio),
                 Domain.Center3D => Lattice.CenterIndex(node, configuration.ratio),
                 Domain.Corner3D => Lattice.CornerIndex(node, configuration.ratio),
-                Domain.Polar => Spherical.GetIndex(new Spherical.Angle(node), configuration.layers),
+                Domain.Spherical => Spherical.GetIndex(new Spherical.Angle(node), configuration.layers),
                 _ => throw new("Unknown input"),
             };
 
@@ -108,7 +139,7 @@ namespace EZ.Index.GizmoDemo
                 Domain.Whole3D => Lattice.WholeNode(matchingIndex, configuration.ratio),
                 Domain.Center3D => Lattice.CenterNode(matchingIndex, configuration.ratio),
                 Domain.Corner3D => Lattice.CornerNode(matchingIndex, configuration.ratio),
-                Domain.Polar => Spherical.GetNode(matchingIndex, configuration.layers).GetCartesian(),
+                Domain.Spherical => Spherical.GetNode(matchingIndex, configuration.layers).GetCartesian(),
                 _ => throw new("Unknown input"),
             };
 
@@ -118,7 +149,7 @@ namespace EZ.Index.GizmoDemo
                 //Debug.LogError($"(Expected : ({i} == {node}) !=  Result: {matchingIndex} == {matchingNode})");
             }
 
-            if (configuration.domain == Domain.Polar)
+            if (configuration.domain == Domain.Spherical)
             {
                 node *= configuration.radius;
             }
@@ -135,7 +166,7 @@ namespace EZ.Index.GizmoDemo
                 Domain.Whole3D => Lattice.GetTotal(configuration.ratio, Index.Domain.Wholes),
                 Domain.Center3D => Lattice.GetTotal(configuration.ratio, Index.Domain.Centers),
                 Domain.Corner3D => Lattice.GetTotal(configuration.ratio, Index.Domain.Corners),
-                Domain.Polar => Spherical.GetTotal(configuration.layers),
+                Domain.Spherical => Spherical.GetTotal(configuration.layers),
                 _ => throw new("Unknown input"),
             };
         }
@@ -149,7 +180,7 @@ namespace EZ.Index.GizmoDemo
                 Domain.Whole3D => Lattice.WholeBoundry(node, configuration.ratio),
                 Domain.Center3D => Lattice.CenterBoundry(node, configuration.ratio),
                 Domain.Corner3D => Lattice.CornerBoundry(node, configuration.ratio),
-                Domain.Polar => 0,
+                Domain.Spherical => 0,
 
                 _ => throw new("Unknown input"),
             };
@@ -172,7 +203,6 @@ namespace EZ.Index.GizmoDemo
             public Handle handle;
             [Tooltip("Screen space offset of the text labels")]
             public float2 handleOffset;
-
 
             [Header("    Gizmos")]
             [Tooltip("Color the node based on the handle (x), Draw the node's text labels (y)")]
@@ -214,6 +244,7 @@ namespace EZ.Index.GizmoDemo
                 Draw();
                 configuration.domain = Domain.Center3D;
             }
+
             void Draw()
             {
                 var total = GetTotal();
@@ -228,7 +259,7 @@ namespace EZ.Index.GizmoDemo
                     if (configuration.domain > Domain.Corner2D && gizmos.renderDistance < distance(node, Camera.current.transform.position)) continue;
 
                     var color = Color.white;
-                    var boundry = configuration.domain == Domain.Polar ? 0 : GetBoundry(node);
+                    var boundry = configuration.domain == Domain.Spherical ? 0 : GetBoundry(node);
                     if (any(gizmos.colorText))
                     {
                         switch (gizmos.handle)
@@ -243,29 +274,29 @@ namespace EZ.Index.GizmoDemo
                                 break;
 
                             case Gizmo.Handle.Node:
-                                var uv = configuration.domain == Domain.Polar ? node / PI : node / GetNode(total - 1);
+                                var uv = configuration.domain == Domain.Spherical ? node / PI : node / GetNode(total - 1);
                                 color = uv.y == 0 ? new Color(uv.x, uv.z, uv.y, 1) : new Color(uv.x, uv.y, uv.z, 1);
                                 if (gizmos.colorText.y)
                                 {
                                     var style = new GUIStyle() { normal = new() { textColor = gizmos.colorText.x ? color : Color.black} };
-                                    Handles.Label(GetHandlePosition(node), $"({node.x} , {node.z})", style);
+                                    Handles.Label(GetHandlePosition(node), $"({node.x} , {(configuration.domain < Domain.Corner3D ? node.y : node.z) })", style);
                                 }
                                 break;
 
                             case Gizmo.Handle.Boundry:
                                 var red = select(0, 1f, boundry.x == 1f);
-                                red += select(0, 0.1f, boundry.x == -1);
+                                red += select(0, 0.3f, boundry.x == -1);
 
                                 var green = select(0, 1f, boundry.y == 1);
-                                green += select(0, 0.1f, boundry.y == -1);
+                                green += select(0, 0.3f, boundry.y == -1);
 
                                 var blue = select(0, 1f, boundry.z == 1);
-                                blue += select(0, 0.1f, boundry.z == -1);
+                                blue += select(0, 0.3f, boundry.z == -1);
 
                                 color = (Vector4)float4(red, green, blue, 1);
                                 if (gizmos.colorText.y)
                                 {
-                                    var style = new GUIStyle() { normal = new() { textColor = gizmos.colorText.x ? color : Color.black} };
+                                    var style = new GUIStyle() { normal = new() { textColor = gizmos.colorText.x ? color : Color.black } };
                                     Handles.Label(GetHandlePosition(node), $"{boundry.x}|{boundry.y}", style);
                                 }
                                 break;
@@ -279,7 +310,7 @@ namespace EZ.Index.GizmoDemo
                 var size = result.maximumNode + abs(result.minimumNode);
                 Gizmos.DrawWireCube(center, size);
 
-                if (configuration.domain == Domain.Polar) return;
+                if (configuration.domain == Domain.Spherical) return;
 
                 var sizeStyle = new GUIStyle() { normal = new() { textColor = new(183f / 255, 131f / 255, 72f / 255) }, fontSize = 25 };
                 if (size.x > 1)
