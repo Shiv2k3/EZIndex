@@ -1,0 +1,18 @@
+{
+    "name": "EZ.Index.GizmoDemo",
+    "rootNamespace": "EZ.Index.GizmoDemo",
+    "references": [
+        "GUID:26e8fedbe7040fb47be99fade5b62e66",
+        "GUID:d8b63aba1907145bea998dd612889d6b",
+        "GUID:57864421377275448843a7f232311ba8"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

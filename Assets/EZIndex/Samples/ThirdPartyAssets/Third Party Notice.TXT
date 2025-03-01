@@ -1,0 +1,24 @@
+Third Party Notices and Licenses
+
+This asset includes the following third party content. Each asset is subject to its respective license agreement, which for these assets is the Standard Unity Asset Store End User License Agreement (EULA). For complete license details, please refer to the Unity Asset Store EULA at Unity’s Legal Terms.
+
+1. Surfaces Lite
+
+Publisher: L LowPolyMan
+Asset Store URL: https://assetstore.unity.com/packages/2d/textures-materials/surfaces-lite-89739
+License: Standard Unity Asset Store EULA
+2. Stylized Vegetation FREE Samples
+
+Publisher: PN Poly Ninja
+Asset Store URL: https://assetstore.unity.com/packages/3d/vegetation/stylized-vegetation-free-samples-59916
+License: Standard Unity Asset Store EULA
+3. Mountain Trees – Dynamic Nature
+
+Publisher: N NatureManufacture
+Asset Store URL: https://assetstore.unity.com/packages/3d/vegetation/trees/mountain-trees-dynamic-nature-107004
+License: Standard Unity Asset Store EULA
+4. Mountain Terrain, Rocks and Tree
+
+Publisher: JS Jermesa Studio
+Asset Store URL: https://assetstore.unity.com/packages/3d/environments/landscapes/mountain-terrain-rocks-and-tree-97905
+License: Standard Unity Asset Store EULA
