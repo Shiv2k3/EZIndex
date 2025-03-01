@@ -2,24 +2,26 @@
 This is a library for spatial indexing, its written in C# and can be found on the Unity Asset Store. This document is a tutorial on the library. EZIndex offers 3 different indexable domains, 2D grids, 3D lattices, and Spherical "grids". 
 
 <h2>2D Grids and 3D Lattices</h2>
-This is how you would iterate nodes in a 5x5 grid centered at the origin: ![5x5 grid of nodes](https://github.com/user-attachments/assets/215806ac-d9ae-4e43-88ae-59a27ecc66b7)
+This is how you would iterate nodes in a 9x6 grid centered at the origin: ![9x6 grid of nodes](Image/9x6grid)
 
 ```C#
 using EZ.Index;
 
 /* Code */
 
-var ratio = new float2(5, 5);
+var ratio = new float2(9, 6);
 var total = Grid.GetTotal(ratio, Domain.Centers);
 for (int n = 0; n < total; n++)
 {
   var node = Grid.CenterNode(in n, in ratio);
 }
 ```
-To achive something similar in 3D, you would simply change the 2 calls to Grid with Lattice, and use float3 for the ratio, for example :
+To achive something similar in 3D, you would simply change the 2 calls to Grid with Lattice, and use float3 for the ratio:
 ```C#
-var total = Lattice.GetTotal(new float3(5,5,5), Domain.Centers); // Total nodes in a 5x5x5 centered grid
+var total = Lattice.GetTotal(new float3(9,6,6), Domain.Centers); // Total nodes in a 5x5x5 centered grid
 ```
+
+
 The Polar domain is useful for iterating over a spherical surface. The syntax for iterating ndoes is almost the same, except the usage of a custom struct Angle over the float2 and a node-layers system.
 ```C#
 var layers = 10;
