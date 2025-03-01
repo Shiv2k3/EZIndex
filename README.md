@@ -53,7 +53,7 @@ Here is a visual example of this method in shader toy: https://www.shadertoy.com
 
 ![10 layer based sphere](Images/10layers.png)
 
-<h2>Inverse Hashing</h2>
+<h2>Node Hashing</h2>
 
 ![9x6 indexed grid](Images/indexedgrid.png)<br/>
 
