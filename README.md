@@ -2,7 +2,7 @@
 This is a library for spatial indexing, its written in C# and can be found on the Unity Asset Store. This document is a tutorial on the library. EZIndex offers 3 different indexable domains, 2D grids, 3D lattices, and Spherical "grids". 
 
 <h2>2D Grids and 3D Lattices</h2>
-This is how you would iterate nodes in a 9x6 grid centered at the origin: ![9x6 grid of nodes](Image/9x6grid)
+This is how you would iterate nodes in a 9x6 grid centered at the origin: ![9x6 grid of nodes](Images/9x6grid)
 
 ```C#
 using EZ.Index;
