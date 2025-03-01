@@ -225,7 +225,7 @@ namespace EZ.Index.PrefabSpawnning
                 this.cfg = cfg;
 
                 total = cfg.domain is Domain.Polar
-                    ? Polar.GetTotal(cfg.nodeLayers)
+                    ? Spherical.GetTotal(cfg.nodeLayers)
                     : (int)cfg.domain > (int)Domain.Center2D ? cfg.ratio.x * cfg.ratio.y * cfg.ratio.z 
                     : cfg.ratio.x * cfg.ratio.y;
 
@@ -266,7 +266,7 @@ namespace EZ.Index.PrefabSpawnning
                     Domain.Center3D => Lattice.CenterNode(i, cfg.ratio),
                     Domain.Corner3D => Lattice.CornerNode(i, cfg.ratio),
                     Domain.Whole3D => Lattice.WholeNode(i, cfg.ratio),
-                    Domain.Polar => Polar.GetNode(i, cfg.nodeLayers).GetCartesian() * cfg.radius,
+                    Domain.Polar => Spherical.GetNode(i, cfg.nodeLayers).GetCartesian() * cfg.radius,
                     _ => throw new NotImplementedException(),
                 };
 

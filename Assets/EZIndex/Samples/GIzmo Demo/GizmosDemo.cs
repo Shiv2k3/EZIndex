@@ -84,7 +84,7 @@ namespace EZ.Index.GizmoDemo
                 Domain.Whole3D => Lattice.WholeNode(i, configuration.ratio),
                 Domain.Center3D => Lattice.CenterNode(i, configuration.ratio),
                 Domain.Corner3D => Lattice.CornerNode(i, configuration.ratio),
-                Domain.Polar => Polar.GetNode(i, configuration.layers).GetCartesian(),
+                Domain.Polar => Spherical.GetNode(i, configuration.layers).GetCartesian(),
                 _ => throw new("Unknown input"),
             };
 
@@ -96,7 +96,7 @@ namespace EZ.Index.GizmoDemo
                 Domain.Whole3D => Lattice.WholeIndex(node, configuration.ratio),
                 Domain.Center3D => Lattice.CenterIndex(node, configuration.ratio),
                 Domain.Corner3D => Lattice.CornerIndex(node, configuration.ratio),
-                Domain.Polar => Polar.GetIndex(new Polar.Angle(node), configuration.layers),
+                Domain.Polar => Spherical.GetIndex(new Spherical.Angle(node), configuration.layers),
                 _ => throw new("Unknown input"),
             };
 
@@ -108,7 +108,7 @@ namespace EZ.Index.GizmoDemo
                 Domain.Whole3D => Lattice.WholeNode(matchingIndex, configuration.ratio),
                 Domain.Center3D => Lattice.CenterNode(matchingIndex, configuration.ratio),
                 Domain.Corner3D => Lattice.CornerNode(matchingIndex, configuration.ratio),
-                Domain.Polar => Polar.GetNode(matchingIndex, configuration.layers).GetCartesian(),
+                Domain.Polar => Spherical.GetNode(matchingIndex, configuration.layers).GetCartesian(),
                 _ => throw new("Unknown input"),
             };
 
@@ -135,7 +135,7 @@ namespace EZ.Index.GizmoDemo
                 Domain.Whole3D => Lattice.GetTotal(configuration.ratio, Index.Domain.Wholes),
                 Domain.Center3D => Lattice.GetTotal(configuration.ratio, Index.Domain.Centers),
                 Domain.Corner3D => Lattice.GetTotal(configuration.ratio, Index.Domain.Corners),
-                Domain.Polar => Polar.GetTotal(configuration.layers),
+                Domain.Polar => Spherical.GetTotal(configuration.layers),
                 _ => throw new("Unknown input"),
             };
         }
