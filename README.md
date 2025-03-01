@@ -57,9 +57,11 @@ Here is a visual example of this method in shader toy: https://www.shadertoy.com
 
 ![9x6 indexed grid](Images/indexedgrid.png)<br/>
 
-This library wouldn't be complete if it didn't include a way to get the index when given a node. A possible use case for these methods could be finding an object on an axis aligned grid that is the closest to the player.
+This library wouldn't be complete if it didn't include a way to get the index when given a node. 
+A possible use case for node hashing could be player picking up consumeable healthdrops.
 ```C#
-var node = Grid.SnapCenter(playerPosition.xy, ratio.xy); // Snap the player's position to the centered grid
+var healthdrops = new Dictionary<int, GameObject>(); // Image this stores the mapping of node indices to healthdrop GOs
+var node = Grid.SnapCenter(playerPosition.xy, ratio.xy); // Snap the player's position to the nearest node on the centered grid
 var index = Grid.CenterIndex(node, ratio.xy); // calculate the new node's index
 if (healthdrops.TryGetValue(index, out var drop)) // get the drop if it exists
 {
