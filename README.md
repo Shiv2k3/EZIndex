@@ -59,11 +59,16 @@ Here is a visual example of this method in shader toy: https://www.shadertoy.com
 
 This library wouldn't be complete if it didn't include a way to get the index when given a node. A possible use case for these methods could be finding an object on an axis aligned grid that is the closest to the player.
 ```C#
-var objectsMap = new Dictionary<int, GameObject>(); // Imagine this is filled with indices of nodes that contain healthdrops
-var nearestIndex = Grid.CenterIndex(playerPosition.xz, new float2(9, 6)); // This finds the node index neareast to the player's grid position
-if (objectsMap.TryGetValue(neareastIndex, out var drop))
+var node = Grid.SnapCenter(playerPosition.xy, ratio.xy); // Snap the player's position to the centered grid
+var index = Grid.CenterIndex(node, ratio.xy); // calculate the new node's index
+if (healthdrops.TryGetValue(index, out var drop)) // get the drop if it exists
 {
-  var closeEnough = Mathf.Distance(playerPosition, drop.transform.position) <= 1; // Distance between the healthdrop and player is <= 1
-  if (closeEnough) ConsumeDrop(drop); // Player consumes the drop
+    var closeEnough = distance(playerPosition, drop.transform.position) <= 1;
+    if (closeEnough) // check if its close enough to be picked up
+    {
+        healthdrops.Remove(index); // consume
+        Destroy(drop); // consume
+    }
 }
 ```
+![Picking up hearts](https://youtu.be/M3oS3RcauJ8)
