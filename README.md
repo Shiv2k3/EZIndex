@@ -71,4 +71,4 @@ if (healthdrops.TryGetValue(index, out var drop)) // get the drop if it exists
     }
 }
 ```
-![Picking up hearts](https://youtu.be/M3oS3RcauJ8)
+![hippo](Images/hearts.gif)
