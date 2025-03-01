@@ -164,36 +164,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   configuration:
-    domain: 1
+    domain: 0
     ratio:
-      x: 16
-      y: 7
-      z: 8
-    layers: 69
+      x: 9
+      y: 6
+      z: 6
+    layers: 13
     radius: 10
   result:
     minimumNode:
-      x: -7.5
-      y: -3
+      x: 0
+      y: 0
       z: 0
     maximumNode:
-      x: 7.5
-      y: 3
+      x: 8
+      y: 5
       z: 0
     indexRange:
       x: 0
-      y: 111
-    total: 112
+      y: 53
+    total: 54
   gizmos:
-    handle: 1
+    handle: 0
     handleOffset:
       x: 1
       y: 3
     colorText:
-      x: 1
-      y: 0
-    renderDistance: 25
-    radius: 0.16
+      x: 0
+      y: 1
+    renderDistance: 54.9
+    radius: 0.19
     centerChecker: 0
     maxIndex: 50000000
 --- !u!1660057539 &9223372036854775807

@@ -3,7 +3,7 @@ This is a library for spatial indexing, its written in C# and can be found on th
 
 <h2>2D Grids and 3D Lattices</h2>
 
-![9x6 grid of nodes](Images/9x6grid.png) <br/>
+![9x6 grid of nodes](/Images/9x6grid.png) <br/>
 This is how you would iterate nodes in a 9x6 grid centered at the origin
 ```C#
 using EZ.Index;
