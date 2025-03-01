@@ -45,7 +45,7 @@ for (int n = 0; n < total; n++)
   var node = Spherical.GetNode(in n, in layers); // typeof(node) = Angle
 }
 ```
-
+<h3>How is the total number of nodes on the sphere surface calculated?</h3>
 It sound complex, but layers simply means the number of vertical layers/rings of nodes on the sphere surface. The math behind it is complex and understanding it isn't required for usage, but for a 10 layer sphere surface, there are exactly 102 nodes, 1 north pole node (index 0), 1 south pole node (index 101), and 50 in each hemisphere (index [1, 100]). The count of nodes in each layer moving towards the equator has 4 more than the previous layer, not including the poles. <br/>
 Here is a visual example of this method: https://www.shadertoy.com/view/NtKyWV. <br/>
 ![10 layer based sphere](Images/10layers.png)
