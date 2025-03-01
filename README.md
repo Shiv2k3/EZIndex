@@ -17,7 +17,6 @@ for (int n = 0; n < total; n++)
   var node = Grid.CenterNode(in n, in ratio);
 }
 ```
-<br/>
 ![9x6x6 node lattice](Images/9x6x6lattice.png) <br/>
 To achive something similar in 3D, you would simply change the 2 calls to Grid with Lattice, and use float3 for the ratio:
 ```C#
