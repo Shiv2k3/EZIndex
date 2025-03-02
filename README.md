@@ -23,7 +23,7 @@ You may expect Domain enum to be differentiating between Grid, Lattice, or Spher
 
 <h2>Why are the methods statically typed for each Domain kind?</h2>
 If you didn't notice, Grid.CenterNode(...)
-was used to get the node. You may be wondering why it is defiend when its possible to defining a Domain parameter and have fewer methods. The reason for this is because this library may be used for calculating billions of nodes/indices, so defining a Domain parameter would require using a switch statement or conditional blocks for every call. Due to this performance optimization/limitation, Grid/Lattice deifnes static hashing/reversing methods for each Domain kind.
+was used to get the node. You may be wondering why it is defiend when its possible to define a Domain parameter and have fewer methods. The reason for this is because this library may be used for calculating billions of nodes/indices, so defining a Domain parameter would require using a switch statement or a conditional block in every call. Due to this performance optimization/limitation, Grid/Lattice deifnes static hashing/reversing methods for each Domain kind.
 
 <h2>Lattice</h2>
 
