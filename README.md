@@ -1,11 +1,11 @@
 <h1>Welcome to EZ Indexing!</h1>
 
-EZIndex is used for spatial indexing, its written in C# and the library can be purchased on the Unity Asset Store. This is a quick tutorial on the library. EZIndex offers 3 domain types - Grid, Lattice, and Sphere. 
+EZIndex is used for spatial indexing, the library can be purchased on the Unity Asset Store. This is a quick intro to the 3 domain types offered: Grid, Lattice, and Spherical. 
 
-<h2>2D Grids</h2>
+<h2>Grid</h2>
 
 Grid is the 2 dimensional indexing space, and the name of the static struct that contians it's corresponding methods.
-This is how you would iterate nodes in a 9x6 grid centered at the origin using Grid -
+This is how you would iterate nodes in a 9x6 grid centered at the origin using Grid:
 ```C#
 using EZ.Index;
 
@@ -18,12 +18,16 @@ for (int n = 0; n < total; n++)
 ```
 ![9x6 grid of nodes](/Images/9x6grid.png)
 
-<h3>The Domain enum</h3>
-Domain enum describes what offsets the nodes are in. In the example, `Domain.Centers` means the nodes will be in the center of each unit within the domain's bounds. Whereas `Domain.Corners` means the nodes will be in the corners of each unit in the domains bounds. The last type `Domain.Whole` means the nodes will always have integer coordinates located in the first quadrant/octant, so only whole numbered nodes!
+<h3>What is the Domain.Centers?</h3>
+You may expect Domain enum to be differentiating between Grid, Lattice, or Spherical, instead it describes the kind of coordinates the nodes have within the bounded Grid or Lattice. In the example above, the Domain.Centers argument is used for getting the node count, this is because the units within their domain have unique locations within them, so sub-domains based on these locations have a different node count. Domain is essentially a way to choose the location in a unit as the node. There are two more locations beside the unit centers: corners and wholes. Domain.Corners describes the corners of each unit within the domain's bounds, think of it as the compliment of Domain.Centers. Centers and Corners domain is centered about the orign while Wholes is not. Domain.Wholes describes the integer coordinates of the domain and all coordinates components are whole numbers, this is an important one as other two are built on top of this domain! 
 
-<h2>3D Lattices</h2>
+<h2>Why are the methods statically typed for each Domain kind?</h2>
+If you didn't notice, Grid.CenterNode(...)
+was used to get the node. You may be wondering why it is defiend when its possible to defining a Domain parameter and have fewer methods. The reason for this is because this library may be used for calculating billions of nodes/indices, so defining a Domain parameter would require using a switch statement or conditional blocks for every call. Due to this performance optimization/limitation, Grid/Lattice deifnes static hashing/reversing methods for each Domain kind.
 
-To achive something similar in 3D, you would simply change the 2 calls to Grid with Lattice, and use float3 for the ratio:
+<h2>Lattice</h2>
+
+To achive something similar to the 6x9 grid from the Grid example in 3D, for example a 9x6x6 lattice, you would simply change the 2 calls to Grid with Lattice, and use a float3 for the ratio:
 ```C#
 var ratio = new float3(9, 6, 6);
 var total = Lattice.GetTotal(ratio, Domain.Centers);
@@ -34,9 +38,9 @@ for (int n = 0; n < total; n++)
 ```
 ![9x6x6 node lattice](Images/9x6x6lattice.png)
 
-<h2>Spherical Domain</h2>
+<h2>Spherical</h2>
 
-The Spherical domain is useful for iterating over a spherical surface. The syntax for iterating ndoes is almost the same, except the usage of a custom struct Angle over the float2 to store the angles, and a node-layers system.
+The Spherical domain is useful for iterating over a sphere's surface. The syntax for iterating ndoes is almost the same, except the usage of a custom struct Angle over the float2 to store the angle values, and a layer based node count system.
 
 ```C#
 var layers = 10;
@@ -48,9 +52,9 @@ for (int n = 0; n < total; n++)
 ```
 ![sphere with 13 node-layers](Images/13layers.png) <br/>
 
-<h3>How is the total number of nodes on the sphere surface calculated?</h3>
+<h3>What is a layer based node count system?</h3>
 
-It sound complex, but layers simply means the number of vertical layers/rings of nodes on the sphere surface. The math behind it is complex and understanding it isn't required for usage, but for a 10 layer sphere surface, there are exactly 102 nodes, 1 north pole node (index 0), 1 south pole node (index 101), and 50 in each hemisphere (index [1, 100]). The count of nodes in each layer moving towards the equator has 4 more than the previous layer, not including the poles. <br/>
+It sound complex, but a layer is simply a ring of nodes, and so, layers is the number of rings of nodes on the sphere surface. The math is complex and understanding it isn't required for usage, but for a sphere with 10 layers, there are exactly 102 nodes: 1 north pole node (index 0), 1 south pole node (index 101), and 50 in each hemisphere (index [1, 100]). Each ring going towards the equator has 4 more nodes than the previous ring, not including the poles. <br/>
 
 Here is a visual example of this method in shader toy: https://www.shadertoy.com/view/NtKyWV. <br/>
 
@@ -58,8 +62,8 @@ Here is a visual example of this method in shader toy: https://www.shadertoy.com
 
 <h2>Node Hashing</h2>
 
-This library wouldn't be complete if it didn't include a way to get the index when given a node. 
-A possible use case for node hashing could be player picking up consumeable healthdrops.
+This library wouldn't be complete if it didn't include a way to get the index when given a node, so below is an example.
+A possible use case for node hashing could be a player picking up consumeable healthdrops.
 ```C#
 var healthdrops = new Dictionary<int, GameObject>(); // Image this stores the mapping of node indices to healthdrop GOs
 var node = Grid.SnapCenter(playerPosition.xy, ratio.xy); // Snap the player's position to the nearest node on the centered grid
@@ -76,3 +80,4 @@ if (healthdrops.TryGetValue(index, out var drop)) // get the drop if it exists
 ```
 ![9x6 indexed grid](Images/indexedgrid.png)
 ![hippo](Images/hearts.gif)
+This is allows lesser allocation and faster dictionary operations compared to a Dictionary<Vector2, GameObject>
