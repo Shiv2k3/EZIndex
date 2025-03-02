@@ -1,10 +1,11 @@
 <h1>Welcome to EZ Indexing!</h1>
 
-This is a library for spatial indexing, its written in C# and can be found on the Unity Asset Store. This document is a tutorial on the library. EZIndex offers 3 different indexable domains, 2D grids, 3D lattices, and Spherical "grids". 
+EZIndex is used for spatial indexing, its written in C# and the library can be purchased on the Unity Asset Store. This is a quick tutorial on the library. EZIndex offers 3 domain types - Grid, Lattice, and Sphere. 
 
 <h2>2D Grids</h2>
 
-This is how you would iterate nodes in a 9x6 grid centered at the origin
+Grid is the 2 dimensional indexing space, and the name of the static struct that contians it's corresponding methods.
+This is how you would iterate nodes in a 9x6 grid centered at the origin using Grid -
 ```C#
 using EZ.Index;
 
@@ -16,6 +17,9 @@ for (int n = 0; n < total; n++)
 }
 ```
 ![9x6 grid of nodes](/Images/9x6grid.png)
+
+<h3>The Domain enum</h3>
+Domain enum describes what offsets the nodes are in. In the example, `Domain.Centers` means the nodes will be in the center of each unit within the domain's bounds. Whereas `Domain.Corners` means the nodes will be in the corners of each unit in the domains bounds. The last type `Domain.Whole` means the nodes will always have integer coordinates located in the first quadrant/octant, so only whole numbered nodes!
 
 <h2>3D Lattices</h2>
 
