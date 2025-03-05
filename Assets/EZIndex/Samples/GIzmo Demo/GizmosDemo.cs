@@ -92,7 +92,7 @@ namespace EZ.Index.GizmoDemo
         private void Update()
         {
             var playerPosition = float3(player.position);
-            var node = Grid.SnapCenter(playerPosition.xy, configuration.ratio.xy);
+            var node = Grid.CenterSnap(playerPosition.xy, configuration.ratio.xy);
             var index = Grid.CenterIndex(node, configuration.ratio.xy);
             if (healthdrops.TryGetValue(index, out var drop))
             {
@@ -105,6 +105,15 @@ namespace EZ.Index.GizmoDemo
             }
         }
 
+        enum DebugMode
+        {
+            None,
+            CheckIndex,
+            Error,
+            Throw
+        }
+
+        [SerializeField] DebugMode debug;
         float3 GetNode(in int i)
         {
             var node = configuration.domain switch
@@ -119,34 +128,55 @@ namespace EZ.Index.GizmoDemo
                 _ => throw new("Unknown input"),
             };
 
-            var matchingIndex = configuration.domain switch
+            if (debug > DebugMode.None)
             {
-                Domain.Center2D => Grid.CenterIndex(node.xy, configuration.ratio.xy),
-                Domain.Corner2D => Grid.CornerIndex(node.xy, configuration.ratio.xy),
-                Domain.Whole2D => Grid.WholeIndex(node.xy, configuration.ratio.xy),
-                Domain.Whole3D => Lattice.WholeIndex(node, configuration.ratio),
-                Domain.Center3D => Lattice.CenterIndex(node, configuration.ratio),
-                Domain.Corner3D => Lattice.CornerIndex(node, configuration.ratio),
-                Domain.Spherical => Spherical.GetIndex(new Spherical.Angle(node), configuration.layers),
-                _ => throw new("Unknown input"),
-            };
+                var matchingIndex = configuration.domain switch
+                {
+                    Domain.Center2D => Grid.CenterIndex(node.xy, configuration.ratio.xy),
+                    Domain.Corner2D => Grid.CornerIndex(node.xy, configuration.ratio.xy),
+                    Domain.Whole2D => Grid.WholeIndex(node.xy, configuration.ratio.xy),
+                    Domain.Whole3D => Lattice.WholeIndex(node, configuration.ratio),
+                    Domain.Center3D => Lattice.CenterIndex(node, configuration.ratio),
+                    Domain.Corner3D => Lattice.CornerIndex(node, configuration.ratio),
+                    Domain.Spherical => Spherical.GetIndex(new Spherical.Angle(node), configuration.layers),
+                    _ => throw new("Unknown input"),
+                };
 
-            var matchingNode = configuration.domain switch
-            {
-                Domain.Center2D => float3(Grid.CenterNode(matchingIndex, configuration.ratio.xy), 0),
-                Domain.Corner2D => float3(Grid.CornerNode(matchingIndex, configuration.ratio.xy), 0),
-                Domain.Whole2D => float3(Grid.WholeNode(matchingIndex, configuration.ratio.xy), 0),
-                Domain.Whole3D => Lattice.WholeNode(matchingIndex, configuration.ratio),
-                Domain.Center3D => Lattice.CenterNode(matchingIndex, configuration.ratio),
-                Domain.Corner3D => Lattice.CornerNode(matchingIndex, configuration.ratio),
-                Domain.Spherical => Spherical.GetNode(matchingIndex, configuration.layers).GetCartesian(),
-                _ => throw new("Unknown input"),
-            };
+                if (debug > DebugMode.CheckIndex)
+                {
+                    var matchingNode = configuration.domain switch
+                    {
+                        Domain.Center2D => float3(Grid.CenterNode(matchingIndex, configuration.ratio.xy), 0),
+                        Domain.Corner2D => float3(Grid.CornerNode(matchingIndex, configuration.ratio.xy), 0),
+                        Domain.Whole2D => float3(Grid.WholeNode(matchingIndex, configuration.ratio.xy), 0),
+                        Domain.Whole3D => Lattice.WholeNode(matchingIndex, configuration.ratio),
+                        Domain.Center3D => Lattice.CenterNode(matchingIndex, configuration.ratio),
+                        Domain.Corner3D => Lattice.CornerNode(matchingIndex, configuration.ratio),
+                        Domain.Spherical => Spherical.GetNode(matchingIndex, configuration.layers).GetCartesian(),
+                        _ => throw new("Unknown input"),
+                    };
 
-            if (matchingIndex != i || any(matchingNode != node))
-            {
-                throw new($"(Expected : ({i} == {node}) !=  Result: {matchingIndex} == {matchingNode})");
-                //Debug.LogError($"(Expected : ({i} == {node}) !=  Result: {matchingIndex} == {matchingNode})");
+
+                    if (matchingIndex != i || any(matchingNode != node))
+                    {
+                        if (configuration.domain != Domain.Spherical)
+                        {
+                            if (debug == DebugMode.Throw)
+                                throw new($"(Expected : ({i} == {node}) !=  Result: {matchingIndex} == {matchingNode})");
+                            if (debug == DebugMode.Error)
+                                Debug.LogError($"(Expected : ({i} == {node}) !=  Result: {matchingIndex} == {matchingNode})");
+                        }
+                        else
+                        {
+                            var expected = new Spherical.Angle(node);
+                            var result = new Spherical.Angle(matchingNode);
+                            if (debug == DebugMode.Throw)
+                                throw new($"(Expected : ({i} == {expected}) !=  Result: {matchingIndex} == {result})");
+                            if (debug == DebugMode.Error)
+                                Debug.LogError($"(Expected : ({i} == {expected}) !=  Result: {matchingIndex} == {result})");
+                        }
+                    }
+                }
             }
 
             if (configuration.domain == Domain.Spherical)
@@ -215,6 +245,8 @@ namespace EZ.Index.GizmoDemo
             [Header("Extra")]
             [Tooltip("Additionally draw the Corner nodes when the domain is set to Centers")]
             public bool centerChecker;
+            [Tooltip("Renders a sphere at intersection between the current camera and the sphere")]
+            public bool debugAngles;
             [Min(0), Tooltip("Last node index to draw")] public int maxIndex;
 
             public static Gizmo Default => new()
@@ -230,6 +262,17 @@ namespace EZ.Index.GizmoDemo
         [SerializeField, Tooltip("The parameters for drawing gizmos")] Gizmo gizmos = Gizmo.Default;
         private void OnDrawGizmos()
         {
+            if (gizmos.debugAngles)
+            {
+                var cam = Camera.current.transform; // Get the current camera's transform
+                var angle = new Spherical.Angle(cam.position.normalized);  // get the camera's spherical coordinates
+                var index = Spherical.GetIndex(angle, configuration.layers); // calculate the neareast node's index
+                var camIntersection = angle.GetCartesian() * configuration.radius;
+                Gizmos.color = Color.white;
+                Gizmos.DrawSphere(camIntersection, gizmos.radius); // draw the node as a cube
+                Handles.Label(GetHandlePosition(camIntersection), index.ToString());
+            }
+
             result = Result.Default;
             Draw();
             if (configuration.domain == Domain.Center2D && gizmos.centerChecker)
@@ -245,6 +288,7 @@ namespace EZ.Index.GizmoDemo
                 configuration.domain = Domain.Center3D;
             }
 
+
             void Draw()
             {
                 var total = GetTotal();
@@ -258,7 +302,8 @@ namespace EZ.Index.GizmoDemo
 
                     if (configuration.domain > Domain.Corner2D && gizmos.renderDistance < distance(node, Camera.current.transform.position)) continue;
 
-                    var color = Color.white;
+                    var rng = Unity.Mathematics.Random.CreateFromIndex((uint)i);
+                    var color = (Vector4)float4(normalize(rng.NextFloat3()), 1);
                     var boundry = configuration.domain == Domain.Spherical ? 0 : GetBoundry(node);
                     if (any(gizmos.colorText))
                     {
@@ -274,12 +319,16 @@ namespace EZ.Index.GizmoDemo
                                 break;
 
                             case Gizmo.Handle.Node:
-                                var uv = configuration.domain == Domain.Spherical ? node / PI : node / GetNode(total - 1);
+                                var uv = configuration.domain == Domain.Spherical ? float3(new Spherical.Angle(normalize(node)).cords, 0) : node / GetNode(total - 1);
                                 color = uv.y == 0 ? new Color(uv.x, uv.z, uv.y, 1) : new Color(uv.x, uv.y, uv.z, 1);
                                 if (gizmos.colorText.y)
                                 {
-                                    var style = new GUIStyle() { normal = new() { textColor = gizmos.colorText.x ? color : Color.black} };
-                                    Handles.Label(GetHandlePosition(node), $"({node.x} , {(configuration.domain < Domain.Corner3D ? node.y : node.z) })", style);
+                                    var style = new GUIStyle() { normal = new() { textColor = gizmos.colorText.x ? color : Color.black } };
+
+                                    if (configuration.domain == Domain.Spherical)
+                                        Handles.Label(GetHandlePosition(node), $"({uv.x} , {uv.y})", style);
+                                    else
+                                        Handles.Label(GetHandlePosition(node), $"({node.x} , {(configuration.domain < Domain.Corner3D ? node.y : node.z)})", style);
                                 }
                                 break;
 
@@ -330,16 +379,15 @@ namespace EZ.Index.GizmoDemo
                 if (size.z > 1)
                 {
                     var h = result.minimumNode + float3(0, 0, size.z / 2f);
-                    h.xy-= 0.5f;
+                    h.xy -= 0.5f;
                     Handles.Label(h, configuration.ratio.z.ToString(), sizeStyle);
                 }
-
-                Vector3 GetHandlePosition(in Vector3 position)
-                {
-                    var l = Camera.current.transform.worldToLocalMatrix * position;
-                    l += new Vector4(gizmos.handleOffset.x, gizmos.handleOffset.y, 0, 0) * gizmos.radius;
-                    return Camera.current.transform.localToWorldMatrix * l;
-                }
+            }
+            Vector3 GetHandlePosition(in Vector3 position)
+            {
+                var l = Camera.current.transform.worldToLocalMatrix * position;
+                l += new Vector4(gizmos.handleOffset.x, gizmos.handleOffset.y, 0, 0) * gizmos.radius;
+                return Camera.current.transform.localToWorldMatrix * l;
             }
         }
     }

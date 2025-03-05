@@ -600,7 +600,7 @@ Transform:
   m_GameObject: {fileID: 1306755315}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.1, y: 0.3, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -619,39 +619,44 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   configuration:
-    domain: 1
+    domain: 6
     ratio:
-      x: 9
-      y: 6
-      z: 6
-    layers: 13
+      x: 30
+      y: 30
+      z: 30
+    layers: 20
     radius: 10
   result:
     minimumNode:
-      x: -4
-      y: -2.5
-      z: 0
+      x: -10
+      y: -10
+      z: -10
     maximumNode:
-      x: 4
-      y: 2.5
-      z: 0
+      x: 10
+      y: 10
+      z: 10
     indexRange:
       x: 0
-      y: 53
-    total: 54
+      y: 401
+    total: 402
   heartPrefab: {fileID: 7718501262992331200, guid: 38fe6d81e44766f459c284afbca88c06, type: 3}
   player: {fileID: 787008002}
+  debug: 3
+  upperRatioFactor: 10
+  test: 1
+  cells: 1
   gizmos:
-    handle: 2
+    handle: 3
     handleOffset:
       x: 1
       y: 1
     colorText:
       x: 1
       y: 0
-    renderDistance: 54.9
-    radius: 0.1
+    renderDistance: 10
+    radius: 0.27
     centerChecker: 0
+    debugAngles: 0
     maxIndex: 50000000
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
