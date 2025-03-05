@@ -75,45 +75,17 @@ namespace EZ.Index.GizmoDemo
         [SerializeField, Tooltip("Node generation parameters")] Configuration configuration = Configuration.Default;
         [SerializeField, Tooltip("Results of the node generation"), ReadOnly] Result result = Result.Default;
 
-        private readonly Dictionary<int, GameObject> healthdrops = new();
-        [SerializeField] GameObject heartPrefab;
-        [SerializeField] Transform player;
-        private void Start()
-        {
-            var total = GetTotal();
-            for (int i = 0; i < total; i++)
-            {
-                if (Unity.Mathematics.Random.CreateFromIndex((uint)(i + 938983)).NextBool()) continue;
-                var go = Instantiate(heartPrefab, transform);
-                go.transform.position = GetNode(i);
-                healthdrops.Add(i, go);
-            }
-        }
-        private void Update()
-        {
-            var playerPosition = float3(player.position);
-            var node = Grid.CenterSnap(playerPosition.xy, configuration.ratio.xy);
-            var index = Grid.CenterIndex(node, configuration.ratio.xy);
-            if (healthdrops.TryGetValue(index, out var drop))
-            {
-                var closeEnough = distance(playerPosition, drop.transform.position) <= 1;
-                if (closeEnough)
-                {
-                    healthdrops.Remove(index);
-                    Destroy(drop);
-                }
-            }
-        }
-
-        enum DebugMode
+        enum DebugLevel
         {
             None,
-            CheckIndex,
-            Error,
-            Throw
+            OnlyIndex,
+            CrossCheck
         }
 
-        [SerializeField] DebugMode debug;
+        [Header("Error Debugging")]
+        [SerializeField] DebugLevel debugLevel;
+        [SerializeField] bool throwError;
+
         float3 GetNode(in int i)
         {
             var node = configuration.domain switch
@@ -128,7 +100,7 @@ namespace EZ.Index.GizmoDemo
                 _ => throw new("Unknown input"),
             };
 
-            if (debug > DebugMode.None)
+            if (debugLevel > DebugLevel.None)
             {
                 var matchingIndex = configuration.domain switch
                 {
@@ -142,7 +114,18 @@ namespace EZ.Index.GizmoDemo
                     _ => throw new("Unknown input"),
                 };
 
-                if (debug > DebugMode.CheckIndex)
+                if (debugLevel == DebugLevel.OnlyIndex)
+                {
+                    if (i != matchingIndex)
+                    {
+                        var msg = $"Expected: {i} Result: {matchingIndex}";
+                        if (throwError)
+                            throw new(msg);
+                        else
+                            Debug.LogError(msg);
+                    }
+                }
+                else
                 {
                     var matchingNode = configuration.domain switch
                     {
@@ -156,25 +139,24 @@ namespace EZ.Index.GizmoDemo
                         _ => throw new("Unknown input"),
                     };
 
-
                     if (matchingIndex != i || any(matchingNode != node))
                     {
-                        if (configuration.domain != Domain.Spherical)
-                        {
-                            if (debug == DebugMode.Throw)
-                                throw new($"(Expected : ({i} == {node}) !=  Result: {matchingIndex} == {matchingNode})");
-                            if (debug == DebugMode.Error)
-                                Debug.LogError($"(Expected : ({i} == {node}) !=  Result: {matchingIndex} == {matchingNode})");
-                        }
-                        else
+                        string msg;
+                        if (configuration.domain == Domain.Spherical)
                         {
                             var expected = new Spherical.Angle(node);
                             var result = new Spherical.Angle(matchingNode);
-                            if (debug == DebugMode.Throw)
-                                throw new($"(Expected : ({i} == {expected}) !=  Result: {matchingIndex} == {result})");
-                            if (debug == DebugMode.Error)
-                                Debug.LogError($"(Expected : ({i} == {expected}) !=  Result: {matchingIndex} == {result})");
+                            msg = $"(Expected : ({i} == {expected}) !=  Result: {matchingIndex} == {result})";
                         }
+                        else
+                        {
+                            msg = $"(Expected : ({i} == {node}) !=  Result: {matchingIndex} == {matchingNode})";
+                        }
+
+                        if (throwError)
+                            throw new(msg);
+                        else
+                            Debug.LogError(msg);
                     }
                 }
             }
@@ -204,12 +186,12 @@ namespace EZ.Index.GizmoDemo
         {
             return configuration.domain switch
             {
-                Domain.Center2D => float3(Grid.CenterBoundry(node.xy, configuration.ratio.xy), 0),
-                Domain.Corner2D => float3(Grid.CornerBoundry(node.xy, configuration.ratio.xy), 0),
-                Domain.Whole2D => float3(Grid.WholeBoundry(node.xy, configuration.ratio.xy), 0),
-                Domain.Whole3D => Lattice.WholeBoundry(node, configuration.ratio),
-                Domain.Center3D => Lattice.CenterBoundry(node, configuration.ratio),
-                Domain.Corner3D => Lattice.CornerBoundry(node, configuration.ratio),
+                Domain.Center2D => float3(Grid.BoundryCenter(node.xy, configuration.ratio.xy), 0),
+                Domain.Corner2D => float3(Grid.BoundryCorner(node.xy, configuration.ratio.xy), 0),
+                Domain.Whole2D => float3(Grid.BoundryWhole(node.xy, configuration.ratio.xy), 0),
+                Domain.Whole3D => Lattice.BoundryWhole(node, configuration.ratio),
+                Domain.Center3D => Lattice.BoundryCenter(node, configuration.ratio),
+                Domain.Corner3D => Lattice.BoundryCorner(node, configuration.ratio),
                 Domain.Spherical => 0,
 
                 _ => throw new("Unknown input"),
@@ -346,7 +328,11 @@ namespace EZ.Index.GizmoDemo
                                 if (gizmos.colorText.y)
                                 {
                                     var style = new GUIStyle() { normal = new() { textColor = gizmos.colorText.x ? color : Color.black } };
-                                    Handles.Label(GetHandlePosition(node), $"{boundry.x}|{boundry.y}", style);
+                                    if (!all(boundry == 0))
+                                    {
+                                        var msg = blue == 0 ? $"{boundry.x}|{boundry.y}" : $"{boundry.x}|{boundry.y}|{boundry.z}";
+                                        Handles.Label(GetHandlePosition(node), msg, style);
+                                    }
                                 }
                                 break;
                         }
