@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4606853723561682}
   - component: {fileID: 205838414078788140}
   m_Layer: 0
-  m_Name: Fir_08_Dead_Forest_cheap
+  m_Name: Fir_08_Dead_cheap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
