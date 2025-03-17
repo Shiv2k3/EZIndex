@@ -1,6 +1,6 @@
 <h1> Welcome to the EZIndex repo! </h1>
 
-EZIndex is used for spatial indexing, the library can be purchased on the Unity Asset Store. This is a quick intro to the 3 domain types offered: `Grid`, `Lattice`, and `Spherical`. 
+EZIndex is used for spatial indexing, the library can be purchased on the Unity Asset Store, https://u3d.as/3uj8. This is a quick intro to the 3 domain types offered: `Grid`, `Lattice`, and `Spherical`. 
 
 <br/><h1>Grid</h1>
 Grid is the 2 dimensional indexing space and this is how you would iterate nodes in a 9x6 grid centered at the origin using `Grid`:
