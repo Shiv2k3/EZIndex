@@ -72,3 +72,5 @@ if (healthdrops.TryGetValue(index, out var drop)) // get the drop if it exists
 ![9x6 indexed grid](Images/indexedgrid.png)
 ![player picking up healthdrops](Images/hearts.gif)
 <br/>This is allows for less allocation and faster dictionary operations compared to using `Dictionary<Vector2, GameObject>` for doing this!
+
+Package URL: https://assetstore.unity.com/packages/slug/312259
