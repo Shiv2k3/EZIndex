@@ -1,4 +1,4 @@
-<h1> Welcome to the EZIndex repo! </h1>
+<h1> Welcome to the EZIndex Demo repository! </h1>
 
 EZIndex is used for spatial indexing, the library can be purchased on the Unity Asset Store, https://u3d.as/3uj8. This is a quick intro to the 3 domain types offered: `Grid`, `Lattice`, and `Spherical`. 
 
