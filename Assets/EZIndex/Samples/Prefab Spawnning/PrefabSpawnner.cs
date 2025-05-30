@@ -90,6 +90,7 @@ namespace EZ.Index.PrefabSpawnning
 
             [Header("Prefab Settings")]
             [Range(0.001f, 1f)] public float spawnRate;
+            public bool playModeOnly;
             public Jitter jitter;
 
             [Header("Sphere")]
@@ -150,6 +151,12 @@ namespace EZ.Index.PrefabSpawnning
         private void Update()
         {
             if (prefabs == null || prefabs.Count == 0 || prefabs.Any((x) => x == null)) return;
+            if (!Application.isPlaying && configuration.playModeOnly)
+            {
+                EmptyTransform();
+                return;
+            }
+
 
             configuration.ratio = max(int3(1, 1, 1), configuration.ratio);
             configuration.scale = max(configuration.scale, 0.01f);

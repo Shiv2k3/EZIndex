@@ -30,9 +30,9 @@ namespace EZ.Index.GizmoDemo
             public Domain domain;
             [Tooltip("The ratio of the bounds that includes the node-index space")]
             public int3 ratio;
-            [Tooltip("Number of nodes layers on the sphere, only used when the domain is Polar")]
+            [Tooltip("Number of nodes layers on the sphere, only used when the domain is Spherical")]
             public int layers;
-            [Tooltip("Radius of the sphere, only used when the domain is Polar")]
+            [Tooltip("Radius of the sphere, only used when the domain is Spherical")]
             public float radius;
 
             public static Configuration Default => new()
