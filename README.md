@@ -1,6 +1,6 @@
-<h1> Welcome to the EZIndex repo! </h1>
+<h1> Welcome to the EZIndex Demo repository! </h1>
 
-EZIndex is used for spatial indexing, the library can be purchased on the Unity Asset Store. This is a quick intro to the 3 domain types offered: `Grid`, `Lattice`, and `Spherical`. 
+EZIndex is used for spatial indexing, the library can be purchased on the Unity Asset Store, https://u3d.as/3uj8. This is a quick intro to the 3 domain types offered: `Grid`, `Lattice`, and `Spherical`. If you need assistance or have questions with the library you can join the official discord server https://discord.gg/97M36bqe.
 
 <br/><h1>Grid</h1>
 Grid is the 2 dimensional indexing space and this is how you would iterate nodes in a 9x6 grid centered at the origin using `Grid`:
@@ -72,3 +72,5 @@ if (healthdrops.TryGetValue(index, out var drop)) // get the drop if it exists
 ![9x6 indexed grid](Images/indexedgrid.png)
 ![player picking up healthdrops](Images/hearts.gif)
 <br/>This is allows for less allocation and faster dictionary operations compared to using `Dictionary<Vector2, GameObject>` for doing this!
+
+Package URL: https://assetstore.unity.com/packages/slug/312259
