@@ -298,7 +298,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1306755316
 Transform:
   m_ObjectHideFlags: 0
@@ -350,7 +350,7 @@ MonoBehaviour:
   debugLevel: 2
   throwError: 1
   gizmos:
-    handle: 0
+    handle: 1
     handleOffset:
       x: 1
       y: 1
@@ -436,7 +436,7 @@ MonoBehaviour:
       y: 1
     colorText:
       x: 0
-      y: 1
+      y: 0
     renderDistance: 60
     radius: 0.18
     centerChecker: 0
@@ -446,7 +446,7 @@ MonoBehaviour:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 183416731}
   - {fileID: 1306755316}
   - {fileID: 1738403556}
   - {fileID: 1031175935}
-  - {fileID: 183416731}
